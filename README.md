@@ -45,6 +45,19 @@ Make sure the log file (`sample.log`) is in the same directory.
 This tool can help detect brute-force login attempts by analyzing authentication logs and identifying suspicious IP addresses with high numbers of failed login attempts.
 
 ---
+## Example Output
+
+------> Analysis Log Report <------
+
+IP : 192.168.1.10 ----> 2 Failed attempts
+IP : 45.77.23.19 ----> 5 Failed attempts ⚠ Suspicious
+
+---------> Top 3 suspicious IPs <---------
+
+1. 45.77.23.19 ----> 5 attempts ⚠
+2. 192.168.1.10 ----> 2 attempts
+3. 172.16.0.8 ----> 1 attempts
+
 
 ## Future Improvements
 
