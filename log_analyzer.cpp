@@ -5,24 +5,41 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
+
 /* ===== Function Prototypes ===== */
 string extractIP(const string& line);
-unordered_map<string, int> parseFailedAttempts(const string& filename);
+string extractTimeStamp(const string& line);
+unordered_map<string, vector<string>> parseFailedAttempts(const string& filename);
 vector<pair<string, int>> getTopK(
-    const unordered_map<string, int>& failedAttempts,
+    const unordered_map<string, vector<string>>& failedAttempts,
     int top_k);
 string classifyDanger(int attempt);
 void printReport(
     const unordered_map<string, int>& failedAttempts,
     const vector<pair<string, int>>& topIPs);
 
-/* ===== Parse Log File ===== */
-unordered_map<string, int> parseFailedAttempts(const string& filename) {
+/*=== Extract time stamp */
 
-    unordered_map<string, int> failedAttempts;
+string extractTimeStamp(const string& line) {
+
+    stringstream ss(line);
+    string month, day, time;
+
+    if(!(ss >> month >> day >> time)) {
+        return "";
+    }
+
+    return time;
+}
+
+/* ===== Parse Log File ===== */
+unordered_map<string, vector<string>> parseFailedAttempts(const string& filename) {
+
+    unordered_map<string, vector<string>> failedAttempts;
     ifstream file(filename);
 
     if (!file) {
@@ -35,8 +52,10 @@ unordered_map<string, int> parseFailedAttempts(const string& filename) {
         if (line.find("Failed password") != string::npos) {
 
             string ip = extractIP(line);
-            if (!ip.empty()) {
-                failedAttempts[ip]++;
+            string timestamp = extractTimeStamp(line);
+
+            if (!ip.empty() && !timestamp.empty()) {
+                failedAttempts[ip].push_back(timestamp);
             }
         }
     }
@@ -63,7 +82,7 @@ string extractIP(const string& line) {
 
 /* ===== Top K Suspicious IPs ===== */
 vector<pair<string, int>> getTopK(
-    const unordered_map<string, int>& failedAttempts,
+    const unordered_map<string, vector<string>>& failedAttempts,
     int top_k) {
 
     priority_queue<
@@ -74,7 +93,7 @@ vector<pair<string, int>> getTopK(
 
     for (const auto& entry : failedAttempts) {
 
-        minHeap.push({ entry.second, entry.first });
+        minHeap.push({ entry.second.size(), entry.first });
 
         if (minHeap.size() > top_k) {
             minHeap.pop();
@@ -107,9 +126,60 @@ string classifyDanger(int attempt) {
     return "LOW";
 }
 
+/*===== Convert time to seconds*/
+int convertTimeToSeconds(const string& time) {
+    stringstream ss(time);
+
+    int h, m, s;
+    char c1, c2;
+
+    if (!(ss >> h >> c1 >> m >> c2 >> s)) {
+        return -1;
+    }
+
+    return (h * 3600) + (m * 60) + s;
+}
+
+
+/* ===== Detect Brute Force IPs ===== */
+vector<string> detectBruteForce(
+    const unordered_map<string, vector<string>>& failedAttempts,
+    int threshold,
+    int windowSeconds) {
+    vector<string> result;
+    for (const auto& entry : failedAttempts) {
+        string ip = entry.first;
+        const vector<string>& timestamps = entry.second;
+        vector<int> times;
+        // Convert timestamps to seconds
+        for (const string& t : timestamps) {
+            int sec = convertTimeToSeconds(t);
+            if (sec != -1) {  // ignore invalid timestamps
+                times.push_back(sec);
+            }
+        }
+        if (times.empty()) continue;
+        // Sort times to apply sliding window
+        sort(times.begin(), times.end());
+        int left = 0;
+        for (size_t right = 0; right < times.size(); ++right) {
+            // Shrink window if time difference exceeds windowSeconds
+            while (times[right] - times[left] > windowSeconds) {
+                ++left;
+            }
+            // Check if window contains enough attempts
+            if (right - left + 1 >= threshold) {
+                result.push_back(ip);
+                break; // no need to check further windows for this IP
+            }
+        }
+    }
+    return result;
+}
+
 /* ===== Print Report ===== */
 void printReport(
-    const unordered_map<string, int>& failedAttempts,
+    const unordered_map<string, vector<string>>& failedAttempts,
     const vector<pair<string, int>>& topIPs) {
 
     cout << "\n====== SSH Log Analysis Report ======\n\n";
@@ -117,9 +187,9 @@ void printReport(
     for (const auto& entry : failedAttempts) {
 
         cout << "IP: " << entry.first
-             << " | Attempts: " << entry.second
+             << " | Attempts: " << entry.second.size()
              << " | Severity: "
-             << classifyDanger(entry.second)
+             << classifyDanger(entry.second.size())
              << endl;
     }
 
@@ -151,6 +221,17 @@ int main() {
         auto topIPs = getTopK(failedAttempts, top_k);
 
         printReport(failedAttempts, topIPs);
+
+        vector<string> bruteForceIPs = detectBruteForce(failedAttempts, 5, 30);
+        if (!bruteForceIPs.empty()) {
+            cout << "\n===== Brute Force Attackers (>=5 attempts in 30 sec) =====\n";
+            for (const string& ip : bruteForceIPs) {
+                cout << ip << endl;
+            }
+            cout << "=============================================\n";
+        } else {
+            cout << "\n-----No brute force patterns detected.-----\n";
+        }
 
     }
     catch (const exception& e) {
