@@ -20,7 +20,8 @@ vector<pair<string, int>> getTopK(
 string classifyDanger(int attempt);
 void printReport(
     const unordered_map<string, int>& failedAttempts,
-    const vector<pair<string, int>>& topIPs);
+    const vector<pair<string, int>>& topIPs,
+    const vector<string>& distributedAttacks);
 
 /*=== Extract time stamp */
 
@@ -177,10 +178,59 @@ vector<string> detectBruteForce(
     return result;
 }
 
+/* ===== Detect Distributed Attack =====*/
+
+vector<string> detectDistributedAttack(
+    const unordered_map<string, vector<string>>& failedAttempts,
+    int attemptsThreshold,
+    int ipThreshold,
+    int windowSeconds
+) {
+    vector<string> result;
+    vector<pair<int, string>> events;
+
+    for(const auto& entry : failedAttempts) {
+        string ip = entry.first;
+        for(const string& t : entry.second) {
+            int sec = convertTimeToSeconds(t);
+            if(sec != -1) {
+                events.push_back({sec, ip});
+            }
+        }
+    }
+    /*Sort events*/
+    sort(events.begin(), events.end());
+    /*Sliding window*/
+    unordered_map<string, int> freq;
+    int left = 0;
+
+    for(size_t right = 0; right < events.size(); right++) {
+        string ipRight = events[right].second;
+        freq[ipRight]++;
+
+        while (events[right].first - events[left].first > windowSeconds) {
+            string ipLeft = events[left].second;
+            freq[ipLeft]--;
+            if(freq[ipLeft] == 0) {
+                freq.erase(ipLeft);
+            }
+            left++;
+        }
+        int totalAttempts = right - left + 1;
+        if (totalAttempts >= attemptsThreshold && freq.size() >= ipThreshold) {
+            result.push_back(to_string(events[left].first) + "-" + to_string(events[right].first));
+            break;
+        }
+    }
+
+    return result;
+}
+
 /* ===== Print Report ===== */
 void printReport(
     const unordered_map<string, vector<string>>& failedAttempts,
-    const vector<pair<string, int>>& topIPs) {
+    const vector<pair<string, int>>& topIPs,
+    const vector<string>& distributedAttacks) {
 
     cout << "\n====== SSH Log Analysis Report ======\n\n";
 
@@ -206,6 +256,18 @@ void printReport(
              << endl;
     }
 
+    cout<<"\n ===== Distributed Attacks Detected =====\n";
+
+    if (distributedAttacks.empty()) {
+        cout<<"No distributed attacks detected.\n";
+    } else {
+        for(const string& attack : distributedAttacks) {
+            string nice = attack;
+            replace(nice.begin(), nice.end(), '-', ' ');
+            cout<<"Attack window : From"<< nice <<" seconds"<<endl;
+        }
+    }
+
     cout << "\n======================================\n";
 }
 
@@ -219,8 +281,8 @@ int main() {
 
         auto failedAttempts = parseFailedAttempts(filename);
         auto topIPs = getTopK(failedAttempts, top_k);
-
-        printReport(failedAttempts, topIPs);
+        auto distributedAttacks = detectDistributedAttack(failedAttempts, 10, 3, 30);
+        printReport(failedAttempts, topIPs, distributedAttacks);
 
         vector<string> bruteForceIPs = detectBruteForce(failedAttempts, 5, 30);
         if (!bruteForceIPs.empty()) {
