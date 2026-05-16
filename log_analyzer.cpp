@@ -281,7 +281,7 @@ int main() {
 
         auto failedAttempts = parseFailedAttempts(filename);
         auto topIPs = getTopK(failedAttempts, top_k);
-        auto distributedAttacks = detectDistributedAttack(failedAttempts, 10, 3, 30);
+        auto distributedAttacks = detectDistributedAttack(failedAttempts, 5, 3, 30);
         printReport(failedAttempts, topIPs, distributedAttacks);
 
         vector<string> bruteForceIPs = detectBruteForce(failedAttempts, 5, 30);
