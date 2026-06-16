@@ -26,8 +26,7 @@ Its core feature includes efficient brute-force detection using a sliding window
 
 ## 📸 Sample Output
 
-<img width="1151" height="743" alt="Output" src="https://github.com/user-attachments/assets/7afa2cf4-9db6-4a74-bf3f-ab4c164cc3a5" />
-
+<img width="1680" height="990" alt="Screenshot (256)" src="https://github.com/user-attachments/assets/2f0670c9-6630-4697-b639-dda7142965a8" />
 
 ## Technologies Used
 
