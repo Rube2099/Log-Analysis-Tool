@@ -1,26 +1,51 @@
 # 🔐 SSH Log Analyzer & Brute Force Detector
 
-A lightweight C++ tool that analyzes SSH authentication logs to identify suspicious and malicious login attempts.  
-Its core feature includes efficient brute-force detection using a sliding window algorithm to flag repeated failed logins from the same IP
+A lightweight C++ security tool that analyzes SSH authentication logs to identify suspicious and malicious login attempts.
+Originally designed for efficient brute-force detection, the project has now evolved into a mini SIEM-style monitoring system with advanced threat analysis.
 
 ---
 
-## Features
+✅ Core Features
+SSH Log Parsing
+Parses authentication logs (e.g., /var/log/auth.log) to extract IPs, timestamps, and login status.
 
-- **SSH Log Parsing**  
-  Parses authentication logs (e.g., `/var/log/auth.log`) to extract key fields such as IP address, timestamp, and login status.
-  
-- **Brute Force Detection**  
-  Detects brute-force attacks by identifying repeated failed login attempts from the same IP within a configurable time window using a sliding window algorithm.
+Brute Force Detection
+Identifies repeated failed login attempts from the same IP using a sliding window algorithm.
 
-- **Top-K Attackers Identification**  
-  Ranks the most suspicious IP addresses based on failed attempts using a Min Heap approach.
+Top-K Attackers
+Ranks suspicious IPs with a Min Heap approach.
 
-- **Event Classification**  
-  Classifies login activity into categories with severity levels (LOW / MEDIUM / HIGH).
+Event Classification
+Categorizes login activity into severity levels: LOW / MEDIUM / HIGH.
 
-- **Modular & Efficient Design**  
-  Built with clean, modular C++ code using efficient data structures and algorithms.
+Behavioral Analysis Engine
+Suspicion score tracking per IP
+
+Dynamic risk levels (LOW → MEDIUM → HIGH)
+
+Score decay based on inactivity
+
+Threat Intelligence Integration
+Detects blacklisted IPs
+
+Enriches threat scores for known malicious sources
+
+Threat Scoring System
+Aggregates evidence from multiple detectors to generate overall threat levels:
+LOW / MEDIUM / HIGH / CRITICAL
+
+Distributed Attack Detection
+Flags suspicious activity across multiple IPs within a time window.
+
+Alert Management
+Tracks alert statistics
+
+Generates summaries
+
+Reports top attackers
+
+Threat Dashboard
+Displays the most dangerous IPs and ranks threats by accumulated scores and severity.
 
 ---
 
