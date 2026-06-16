@@ -7,7 +7,7 @@
 
 using namespace std;
 
-ofstream logFile("sample.log", ios::app);
+ofstream logFile("sample.log");
 
 int currentTime = 0;
 
@@ -19,17 +19,34 @@ string randomIP() {
            to_string(rand() % 256) + "." +
            to_string(rand() % 256);
 }
+/*---- Normal traffics ----*/
+
+vector<string> normalIPs =
+{
+    "192.168.1.10",
+    "192.168.1.11",
+    "192.168.1.12",
+    "192.168.1.13"
+};
+
+string getNormalIP()
+{
+    return normalIPs[rand() % normalIPs.size()];
+}
 
 /*---- Generate time ----*/
 
-string formatTime(int seconds) {
+string formatTime(int seconds)
+{
+    seconds %= 86400;
+
     int h = seconds / 3600;
     int m = (seconds % 3600) / 60;
     int s = seconds % 60;
 
     char buffer[9];
 
-    sprintf(buffer, "%02d:%02d:%02d", h, m, s);
+    sprintf(buffer,"%02d:%02d:%02d",h,m,s);
 
     return string(buffer);
 }
@@ -37,6 +54,11 @@ string formatTime(int seconds) {
 /*---- Writing logs ----*/
 
 void writeLog(const string& ip, int currentTime) {
+    cout << "[GENERATOR] "
+     << ip
+     << " time="
+     << currentTime
+     << endl;
     logFile << "Jul 10 " << formatTime(currentTime)
             << " server sshd[123]: Failed password for root from "
             << ip << " port 22 ssh2"
@@ -58,17 +80,33 @@ void simulateBruteForce() {
 }
 
 /*---- Simulate slow brute force ----*/
+const string PERSISTENT_ATTACKER =
+    "10.10.10.10";
 
-void simulatedSlowBruteforce() {
-    string attackerIP = "192.168.1.250";
+void simulatedSlowBruteforce()
+{
+    for(int i = 0; i < 12; i++)
+    {
+        writeLog(PERSISTENT_ATTACKER, currentTime);
+        currentTime += 1200;
 
-    for (int i = 0; i < 6; i++) {
-
-        writeLog(attackerIP, currentTime);
-        currentTime += 20;
-
-        this_thread::sleep_for(chrono::milliseconds(300));
+        this_thread::sleep_for(
+            chrono::milliseconds(300)
+        );
     }
+}
+
+/*---- Test Decay ----*/
+
+void testDecay()
+{
+    string ip = "100.100.100.100";
+
+    writeLog(ip, currentTime);
+
+    currentTime += 1200; // 20 دقيقة
+
+    writeLog(ip, currentTime);
 }
 
 /*---- Distributed Attack ----*/
@@ -97,6 +135,7 @@ void simulateDistributedAttack() {
 int main() {
 
     srand(time(0));
+    testDecay();
 
     while (true) {
 
@@ -104,8 +143,8 @@ int main() {
 
         if (mode == 0) {
             // normal
-            writeLog(randomIP(), currentTime);
-            currentTime += 40;
+            writeLog(getNormalIP(), currentTime);
+            currentTime += rand() % 60 + 10; // 10–69 seconds
         }
         else if (mode == 1) {
             simulateBruteForce();

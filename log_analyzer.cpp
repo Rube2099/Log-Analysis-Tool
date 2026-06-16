@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include "log_utils.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ void printReport(
     const vector<pair<string, int>>& topIPs,
     const vector<string>& distributedAttacks);
 
-/*=== Extract time stamp */
+/*=== Extract time stamp 
 
 string extractTimeStamp(const string& line) {
 
@@ -36,7 +37,7 @@ string extractTimeStamp(const string& line) {
 
     return time;
 }
-
+*/
 /* ===== Parse Log File ===== */
 unordered_map<string, vector<string>> parseFailedAttempts(const string& filename) {
 
@@ -65,7 +66,7 @@ unordered_map<string, vector<string>> parseFailedAttempts(const string& filename
     return failedAttempts;
 }
 
-/* ===== Extract IP ===== */
+/* ===== Extract IP ===== 
 string extractIP(const string& line) {
 
     size_t pos = line.find("from ");
@@ -80,7 +81,7 @@ string extractIP(const string& line) {
 
     return line.substr(start, end - start);
 }
-
+*/
 /* ===== Top K Suspicious IPs ===== */
 vector<pair<string, int>> getTopK(
     const unordered_map<string, vector<string>>& failedAttempts,
@@ -127,7 +128,7 @@ string classifyDanger(int attempt) {
     return "LOW";
 }
 
-/*===== Convert time to seconds*/
+/*===== Convert time to seconds
 int convertTimeToSeconds(const string& time) {
     stringstream ss(time);
 
@@ -141,7 +142,7 @@ int convertTimeToSeconds(const string& time) {
     return (h * 3600) + (m * 60) + s;
 }
 
-
+*/
 /* ===== Detect Brute Force IPs ===== */
 vector<string> detectBruteForce(
     const unordered_map<string, vector<string>>& failedAttempts,
