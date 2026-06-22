@@ -184,10 +184,13 @@ The platform generates an HTML dashboard showing:
 <img width="721" height="1311" alt="Untitled Diagram drawio (1)" src="https://github.com/user-attachments/assets/df23d852-e034-493b-a9f2-2e9d2c9acf56" />
 
 ## Screenshots
+
 ### Incident Report
 <img width="601" height="712" alt="Screenshot (266)" src="https://github.com/user-attachments/assets/1d6ac521-e63b-4d63-8a6f-8659fb8846a1" />
+
 ### Case Management
 <img width="272" height="814" alt="Screenshot (265)" src="https://github.com/user-attachments/assets/d941e233-6afc-4fe4-a63f-009de2cb79e4" />
+
 ### HTML Dashboard
 <img width="484" height="512" alt="Screenshot (272)" src="https://github.com/user-attachments/assets/9b6de8aa-3f2a-4d1f-bc71-fd52daef3735" />
 
