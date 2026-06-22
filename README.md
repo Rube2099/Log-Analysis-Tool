@@ -1,101 +1,189 @@
-# 🔐 SSH Log Analyzer & Brute Force Detector
+# SOC Monitoring & Incident Response Platform
 
-A lightweight C++ security tool that analyzes SSH authentication logs to identify suspicious and malicious login attempts.
-Originally designed for efficient brute-force detection, the project has now evolved into a mini SIEM-style monitoring system with advanced threat analysis.
+A C++-based Security Operations Center (SOC) simulation platform that performs real-time log monitoring, threat detection, incident correlation, threat scoring, automated response, and case management.
 
----
+## Overview
 
-✅ Core Features
-SSH Log Parsing
-Parses authentication logs (e.g., /var/log/auth.log) to extract IPs, timestamps, and login status.
+This project simulates the core workflow of a modern Security Operations Center (SOC).
 
-Brute Force Detection
-Identifies repeated failed login attempts from the same IP using a sliding window algorithm.
-
-Top-K Attackers
-Ranks suspicious IPs with a Min Heap approach.
-
-Event Classification
-Categorizes login activity into severity levels: LOW / MEDIUM / HIGH.
-
-Behavioral Analysis Engine
-Suspicion score tracking per IP
-
-Dynamic risk levels (LOW → MEDIUM → HIGH)
-
-Score decay based on inactivity
-
-Threat Intelligence Integration
-Detects blacklisted IPs
-
-Enriches threat scores for known malicious sources
-
-Threat Scoring System
-Aggregates evidence from multiple detectors to generate overall threat levels:
-LOW / MEDIUM / HIGH / CRITICAL
-
-Distributed Attack Detection
-Flags suspicious activity across multiple IPs within a time window.
-
-Alert Management
-Tracks alert statistics
-
-Generates summaries
-
-Reports top attackers
-
-Threat Dashboard
-Displays the most dangerous IPs and ranks threats by accumulated scores and severity.
+The platform continuously monitors security logs, detects suspicious activities, correlates security events into incidents, prioritizes threats, generates response recommendations, and maintains incident cases for analysts.
 
 ---
 
-## 📸 Sample Output
+## Features
 
-<img width="1680" height="990" alt="Screenshot (256)" src="https://github.com/user-attachments/assets/2f0670c9-6630-4697-b639-dda7142965a8" />
+### Real-Time Log Monitoring
+
+* Continuous log processing
+* Real-time event analysis
+
+### Brute Force Detection
+
+* Detects repeated failed login attempts
+* Tracks attacker IP addresses
+
+### Distributed Attack Detection
+
+* Identifies coordinated attacks from multiple IPs
+* Detects attack bursts within configurable time windows
+
+### Behavioral Detection
+
+* Detects abnormal activity patterns
+* Generates behavior alerts and warnings
+
+### Threat Intelligence
+
+* Detects known malicious IP addresses
+* Integrates threat intelligence feeds
+
+### Threat Scoring Engine
+
+* Dynamic risk scoring per attacker
+* Severity classification:
+
+  * LOW
+  * MEDIUM
+  * HIGH
+  * CRITICAL
+
+### MITRE ATT&CK Mapping
+
+Maps detections to ATT&CK techniques:
+
+| Detection          | Technique |
+| ------------------ | --------- |
+| Brute Force        | T1110     |
+| Distributed Attack | T1498     |
+| Known Malicious IP | T1583     |
+
+### Incident Correlation Engine
+
+* Correlates multiple security events
+* Creates unified incidents
+
+### IOC Database
+
+* Stores Indicators of Compromise
+* Maintains attacker intelligence
+
+### Case Management
+
+* Automatic case creation
+* Dynamic severity updates
+* Dynamic status updates
+
+Case statuses:
+
+* OPEN
+* INVESTIGATING
+* CONTAINED
+
+### Priority Queue
+
+* Sorts incidents by threat score
+* Highlights highest-risk attackers
+
+### Response Recommendation Engine
+
+Generates analyst recommendations based on incident severity.
+
+### Automated Response
+
+For critical incidents:
+
+* Block source IP
+* Escalate incident
+* Trigger containment actions
+
+### Export Capabilities
+
+* JSON incident export
+* HTML dashboard generation
+
+---
+
+## Project Structure
+
+```text
+SOC-Platform/
+│
+├── Alert/
+├── dashboard/
+├── detectors/
+├── ioc/
+├── response/
+├── case_management/
+│
+├── realtime_monitor.cpp
+├── threat_score.cpp
+├── threat_intelligence.cpp
+├── mitre_mapping.cpp
+│
+└── incidents.json
+```
+
+## Sample Output
+
+```text
+===== INCIDENT REPORT =====
+
+IP: 10.10.10.10
+
+Severity: CRITICAL
+
+Threat Score: 56
+
+Reasons:
+ - Known Malicious IP [T1583]
+
+Recommended Actions:
+ - Block source IP
+ - Escalate to security team
+```
+
+---
+
+## Dashboard
+
+The platform generates an HTML dashboard showing:
+
+* Threat scores
+* Severity levels
+* Incident summaries
+* Color-coded alerts
+
+---
 
 ## Technologies Used
 
-Language
-C++
-
-Key Data Structures
--unordered_map<string, vector<time_t>>
--deque
--priority_queue
-
----
-
-## How to Run
-
-1. Compile the program:
-
-2. Run the program:
-
-
-Make sure the log file (`sample.log`) is in the same directory.
+* C++
+* STL
+* File Handling
+* Data Structures
+* Real-Time Processing
+* Threat Intelligence Concepts
+* MITRE ATT&CK Framework
+* Incident Response Concepts
+* SOC Operations Concepts
 
 ---
-
-## Example Use Case
-
-This tool can help detect brute-force login attempts by analyzing authentication logs and identifying suspicious IP addresses with high numbers of failed login attempts.
-
----
-
 
 ## Future Improvements
 
--Real-time log monitoring
-
--Detect distributed attacks (multiple IPs)
-
--Visualization dashboard
+* Threat Hunting Analytics
+* Email Alerting
+* GeoIP Enrichment
+* SIEM Integration
+* REST API Support
+* SOAR-style Playbooks
 
 ---
 
 ## Author
 
 Basil Mohammed
-Electrical & Electronics Engineering Student | Cybersecurity Enthusiast
 
+Electrical Engineering (Electronics & Communications)
 
+Interested in Cybersecurity, SOC Operations, Threat Detection, and Security Automation.
